@@ -9,7 +9,6 @@
 
 You write assembly-like programs, and an included assembler compiles them into bytecode, which the VM executes — **showing in real-time which instruction is in IF, ID, EX, MEM, and WB at every clock cycle**.
 
-This project serves as a **systems programming exercise, an educational teaching tool**, and a **direct extension of CMPEN 331 coursework**.
 
 ---
 
