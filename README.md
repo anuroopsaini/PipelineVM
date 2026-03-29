@@ -8,7 +8,12 @@ Built for HackPSU Spring 2026. Simulates a real CPU pipeline with hazard detecti
 ## What It Does
 You write assembly, the included assembler compiles it to bytecode, and the VM executes it — showing in real time which instruction is in IF, ID, EX, MEM, and WB at every clock cycle. Hazards and forwards are detected and displayed automatically.
 
-## How It Connects to Systems Programming
+## Demo
+![PipelineVM Visualizer](screenshots/screenshot1.jpeg)
+![PipelineVM Visualizer](screenshots/screenshot2.png)
+
+
+## Connection to Systems Programming
 - Written entirely in **C** with no external libraries
 - Implements a **custom ISA**, **two-pass assembler**, and **binary bytecode format**
 - Simulates **load-use stall detection** and **EX/MEM → EX forwarding**
