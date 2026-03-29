@@ -189,10 +189,8 @@ void vm_clock(VM *vm) {
             strncpy(out->mnem, s2.mnem, 23);
             if (s2.ctrl.mem_read) {
                 out->mem_data = dmem_lw(vm, (uint32_t)s2.alu_result);
-                fprintf(stderr, "LW: addr=0x%x val=0x%x\n", s2.alu_result, out->mem_data);
             }
             if (s2.ctrl.mem_write) {
-                fprintf(stderr, "SW: addr=0x%x val=0x%x\n", s2.alu_result, s2.rt_val);
                 dmem_sw(vm, (uint32_t)s2.alu_result, s2.rt_val);
             }
         }

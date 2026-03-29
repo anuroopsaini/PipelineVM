@@ -3,6 +3,6 @@
 
 #include "vm.h" // Include VMContext definition
 
-void viz_render(VM* vm);
+void viz_render(const VM* vm);
 
 #endif // VIZ_H
