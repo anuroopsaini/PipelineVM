@@ -42,30 +42,28 @@ This project serves as a **systems programming exercise, an educational teaching
 [ Terminal Visualizer ]  (viz.c)
 ```
 
+### **Option 2: Use Markdown lists**
+```
 ## Supported ISA
 
-R-type:
+**R-type:**
+- ADD rd, rs, rt
+- SUB rd, rs, rt
+- AND rd, rs, rt
+- OR rd, rs, rt
+- SLT rd, rs, rt (set less than)
 
-ADD rd, rs, rt
-SUB rd, rs, rt
-AND rd, rs, rt
-OR rd, rs, rt
-SLT rd, rs, rt (set less than)
+**I-type:**
+- ADDI rd, rs, imm
+- LW rd, offset(rs)
+- SW rs, offset(rd)
+- BEQ rs, rt, label
 
-I-type:
-
-ADDI rd, rs, imm
-LW rd, offset(rs)
-SW rs, offset(rd)
-BEQ rs, rt, label
-
-J-type:
-
-J label
-JAL label
-JR rs
-
-
+**J-type:**
+- J label
+- JAL label
+- JR rs
+```
 
 
 ## File Structure
