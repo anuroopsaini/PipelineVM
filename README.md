@@ -1,116 +1,112 @@
 # PipelineVM
-*A MIPS-Inspired Bytecode Virtual Machine in C*
+**A MIPS-Inspired 5-Stage Pipelined Virtual Machine in C**
+
+Built for HackPSU Spring 2026. Simulates a real CPU pipeline with hazard detection, data forwarding, and a live terminal visualizer.
 
 ---
 
-## 🖥️ Project Overview
+## What It Does
+You write assembly, the included assembler compiles it to bytecode, and the VM executes it — showing in real time which instruction is in IF, ID, EX, MEM, and WB at every clock cycle. Hazards and forwards are detected and displayed automatically.
 
-**PipelineVM** is a fully functional virtual machine written in C that simulates a simplified MIPS-like instruction set with a **5-stage pipeline**.
+## How It Connects to Systems Programming
+- Written entirely in **C** with no external libraries
+- Implements a **custom ISA**, **two-pass assembler**, and **binary bytecode format**
+- Simulates **load-use stall detection** and **EX/MEM → EX forwarding**
+- Models a **4KB byte-addressable data memory** with big-endian word layout
+- Direct application of CMPEN 331 pipeline concepts (IF, ID, EX, MEM, WB)
 
-You write assembly-like programs, and an included assembler compiles them into bytecode, which the VM executes — **showing in real-time which instruction is in IF, ID, EX, MEM, and WB at every clock cycle**.
+---
 
+## Build & Run
+```bash
+make clean all
+
+# Assemble + run bubble sort
+bin/assembler programs/sort.asm programs/sort.pvm
+bin/pipelinevm programs/sort.pvm
+
+# Assemble + run Fibonacci (result: $t0 = 55)
+bin/assembler programs/fib.asm programs/fib.pvm
+bin/pipelinevm programs/fib.pvm
+```
+
+Press `ENTER` to step cycle by cycle, `R` to run, `Q` to quit.
 
 ---
 
 ## Architecture
-
-```text
+```
 [ .asm file ]
-     │
-     ▼
+      │
+      ▼
 ┌──────────┐
-│ Assembler │  (assembler.c)
+│ Assembler│  (assembler.c) — two-pass, label resolution, big-endian binary
 └──────────┘
-     │ bytecode (.pvm file)
-     ▼
-┌──────────────────────────────┐
-│         PipelineVM           │
-│                              │
-│  ┌─────────────────────────┐ │
-│  │   5-Stage Pipeline Sim  │ │
-│  │  IF → ID → EX → MEM→WB │ │
-│  └─────────────────────────┘ │
-│  ┌──────────┐  ┌──────────┐  │
-│  │ Register │  │  Memory  │  │
-│  │  File    │  │  (4KB)   │  │
-│  │ (32 regs)│  │  array   │  │
-│  └──────────┘  └──────────┘  │
-└──────────────────────────────┘
-     │
-     ▼
-[ Terminal Visualizer ]  (viz.c)
+      │  .pvm bytecode
+      ▼
+┌─────────────────────────────────┐
+│           PipelineVM            │
+│  ┌──────────────────────────┐   │
+│  │  IF → ID → EX → MEM → WB│   │
+│  └──────────────────────────┘   │
+│  ┌───────────┐  ┌────────────┐  │
+│  │  Register │  │   4KB Data │  │
+│  │  File     │  │   Memory   │  │
+│  │ (32 regs) │  │  (byte arr)│  │
+│  └───────────┘  └────────────┘  │
+└─────────────────────────────────┘
+      │
+      ▼
+[ ANSI Terminal Visualizer ]  (viz.c)
 ```
 
-### **Option 2: Use Markdown lists**
-```
+---
+
 ## Supported ISA
 
-**R-type:**
-- ADD rd, rs, rt
-- SUB rd, rs, rt
-- AND rd, rs, rt
-- OR rd, rs, rt
-- SLT rd, rs, rt (set less than)
+**R-type:** `ADD`, `SUB`, `AND`, `OR`, `SLT`, `SLL`, `JR`
 
-**I-type:**
-- ADDI rd, rs, imm
-- LW rd, offset(rs)
-- SW rs, offset(rd)
-- BEQ rs, rt, label
+**I-type:** `ADDI`, `LW`, `SW`, `BEQ`, `BNE`
 
-**J-type:**
-- J label
-- JAL label
-- JR rs
-```
+**J-type:** `J`, `JAL`
 
+---
+
+## Demo Programs
+
+| Program | Description | Result |
+|---|---|---|
+| `fib.asm` | Computes Fibonacci(10) | `$t0 = 55` in 67 cycles |
+| `sort.asm` | Bubble sorts `[5,3,1,4,2]` | `dmem = [1,2,3,4,5]` in 106 cycles |
+| `hello.asm` | Countdown loop | `$t0 = 0` |
+
+---
+
+## Pipeline Features
+- **Load-use hazard detection** → 1-cycle stall bubble inserted
+- **EX/MEM → EX forwarding** → eliminates stalls where possible
+- **MEM/WB → EX forwarding**
+- **Branch resolution in EX** → 2-stage flush on taken branch
+- **Jump resolution in ID** → 1-stage flush
+
+---
 
 ## File Structure
 ```
 pipelinevm/
 ├── src/
-│   ├── assembler.c     # Tokenizer + encoder → .pvm bytecode
-│   ├── vm.c            # Main fetch-decode-execute loop
-│   ├── pipeline.c      # Pipeline stage structs + stall/hazard logic
-│   ├── memory.c        # Register file + data memory abstraction
-│   ├── viz.c           # Terminal visualization (ANSI colors)
+│   ├── assembler.c   # Two-pass assembler, binary encoder
+│   ├── vm.c          # Pipeline clock cycle, hazard/forward logic
+│   ├── pipeline.c    # Pipeline struct initialization
+│   ├── memory.c      # Register file, byte-addressed data memory
+│   ├── viz.c         # ANSI terminal visualizer
 │   └── main.c
-├── programs/
-│   ├── fib.asm         # Fibonacci demo
-│   ├── sort.asm        # Bubble sort demo
-│   └── hello.asm       # Simple loop
-├── include/
-│   ├── isa.h           # Opcode enum, instruction struct
-│   ├── pipeline.h
-│   └── vm.h
+├── programs/         # .asm demo programs
+├── include/          # isa.h, pipeline.h, vm.h, viz.h
 └── Makefile
 ```
 
-
-## Terminal Visualizer
-Every clock cycle, the terminal prints the current pipeline state:
-```
-═══════════════════════════════════════════════
-  PipelineVM  |  Cycle: 14  |  PC: 0x001C
-═══════════════════════════════════════════════
-
-  IF  │  ID  │  EX  │ MEM  │  WB
-──────┼───────┼───────┼──────┼───────
- BEQ  │ ADD  │ LW   │ ADDI │ SUB
- r2r3 │r1,r2 │r3,4  │r1,5  │r4,r5
-──────┼───────┼───────┼──────┼───────
-                ⚠ DATA HAZARD (stall)
-
-  Registers:
-  $0=0  $1=13  $2=8  $3=5  $4=3  $5=2 ...
-
-  Memory [0x00–0x10]:
-  00 00 00 0D 00 00 00 08 ...
-═══════════════════════════════════════════════
-  [SPACE] step  |  [R] run  |  [Q] quit
-```
-
-
+---
 
 ## License
-MIT License — feel free to use, modify, and share.
+MIT
