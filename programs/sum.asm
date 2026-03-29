@@ -17,4 +17,4 @@ sum_done:
         # Halt the program
         # Your ISA may require using a register check or just stopping
         # For demo purposes, we can leave the last instruction as NOP
-        NOP
+        sum_done: J sum_done
