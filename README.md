@@ -69,6 +69,7 @@ JR rs
 
 
 ## File Structure
+```
 pipelinevm/
 ├── src/
 │   ├── assembler.c     # Tokenizer + encoder → .pvm bytecode
@@ -86,11 +87,12 @@ pipelinevm/
 │   ├── pipeline.h
 │   └── vm.h
 └── Makefile
-
+```
 
 
 ## Terminal Visualizer
 Every clock cycle, the terminal prints the current pipeline state:
+```
 ═══════════════════════════════════════════════
   PipelineVM  |  Cycle: 14  |  PC: 0x001C
 ═══════════════════════════════════════════════
@@ -109,7 +111,7 @@ Every clock cycle, the terminal prints the current pipeline state:
   00 00 00 0D 00 00 00 08 ...
 ═══════════════════════════════════════════════
   [SPACE] step  |  [R] run  |  [Q] quit
-
+```
 
 
 
